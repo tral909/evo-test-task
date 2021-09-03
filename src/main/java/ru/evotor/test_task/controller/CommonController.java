@@ -21,6 +21,9 @@ public class CommonController {
 
     @PostMapping
     public ResponseDto request(@RequestBody RequestDto dto) {
+        if (dto.getType() == null) {
+            return new ResponseDto(ResultCode.INTERNAL_ERROR.getCode());
+        }
         switch (dto.getType()) {
             case CREATE:
                 return commonService.createUser(dto);

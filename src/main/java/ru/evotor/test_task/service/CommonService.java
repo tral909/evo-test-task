@@ -3,6 +3,7 @@ package ru.evotor.test_task.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.evotor.test_task.dao.UserDao;
 import ru.evotor.test_task.dto.ExtrasDto;
@@ -36,6 +37,10 @@ public class CommonService {
             } else {
                 return new ResponseDto(ResultCode.USER_EXISTS.getCode());
             }
+        } catch (DataIntegrityViolationException e) {
+            // При одновременных запросах с одинаковым логином, приходится обработывать через исключение
+            // чтобы вернуть не системую ошибку, а код ответа об уже существующем пользователе
+            return new ResponseDto(ResultCode.USER_EXISTS.getCode());
         } catch (DataAccessException e) {
             log.error("{} code({}) occured", ResultCode.INTERNAL_ERROR.toString(), ResultCode.INTERNAL_ERROR.getCode(), e);
             return new ResponseDto(ResultCode.INTERNAL_ERROR.getCode());
